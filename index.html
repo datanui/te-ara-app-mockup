@@ -162,6 +162,7 @@
       placeholder: "Ma voiture ne démarre pas, Mon ordinateur est bloqué...",
       listTitle: "Mécaniciens disponibles",
       aiMessage1: "J'ai sélectionné pour vous une liste de mécaniciens.",
+      aiMessage1Link: "liste de mécaniciens",
       aiMessage2: "Pourriez-vous m'indiquer la marque et le modèle de votre véhicule afin que j'affine les résultats ?",
       brandsTitle: "Sélectionnez une marque :",
       showBrands: true,
@@ -220,6 +221,7 @@
       placeholder: "J'ai un problème de succession, je veux divorcer, j'ai besoin de conseils juridique.",
       listTitle: "Professionnels du droit disponibles",
       aiMessage1: "J'ai sélectionné pour vous une liste de professionnels du droit.",
+      aiMessage1Link: "liste de professionnels du droit",
       aiMessage2: "Pouvez-vous préciser votre besoin afin que je vous oriente vers le professionnel le plus adapté ?",
       brandsTitle: "",
       showBrands: false,
@@ -570,37 +572,10 @@
         );
       }
 
-      const switchVersion = () => {
-        const newVersion = version === 'general' ? 'services' : 'general';
-        window.location.href = `?version=${newVersion}`;
-      };
-
       return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
           <div className="container mx-auto px-4 py-8 max-w-4xl">
-            <div className="text-center mb-12 relative">
-              <div className="absolute top-0 right-0">
-                <div className="flex items-center gap-2 bg-white rounded-lg shadow-md px-4 py-2">
-                  <span className={`text-sm font-medium ${version === 'general' ? 'text-blue-600' : 'text-gray-400'}`}>
-                    Générale
-                  </span>
-                  <button
-                    onClick={switchVersion}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      version === 'services' ? 'bg-blue-600' : 'bg-gray-300'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                        version === 'services' ? 'translate-x-6' : 'translate-x-1'
-                      }`}
-                    />
-                  </button>
-                  <span className={`text-sm font-medium ${version === 'services' ? 'text-blue-600' : 'text-gray-400'}`}>
-                    Services
-                  </span>
-                </div>
-              </div>
+            <div className="text-center mb-12">
               <h1 className="text-4xl font-bold text-gray-800 mb-3">
                 Te Ara Téléassistance
               </h1>
@@ -622,12 +597,12 @@
                         <div className="text-blue-600 font-medium">
                           {msg.text === config.aiMessage1 ? (
                             <>
-                              {config.aiMessage1.substring(0, config.aiMessage1.lastIndexOf(' '))}{' '}
+                              J'ai sélectionné pour vous une{' '}
                               <a
                                 href="#professionals-list"
                                 className="underline hover:text-blue-800 font-semibold"
                               >
-                                {config.aiMessage1.split(' ').slice(-4).join(' ')}
+                                {config.aiMessage1Link}
                               </a>
                               .
                             </>
