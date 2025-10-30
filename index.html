@@ -107,57 +107,131 @@
       React.createElement('line', { x1: "2", y1: "2", x2: "22", y2: "22" })
     );
 
-    const professionals = [
-      {
-        id: 1,
-        name: "Marc Dubois",
-        specialty: "Mécanicien automobile",
-        location: "Papeete",
-        price: 85,
-        rating: 4.8,
-        reviews: 127,
-        available: true,
-        nextSlot: null
-      },
-      {
-        id: 2,
-        name: "Sophie Martin",
-        specialty: "Spécialiste Toyota",
-        location: "Rennes",
-        price: 95,
-        rating: 4.9,
-        reviews: 203,
-        available: false,
-        nextSlot: "18h30"
-      },
-      {
-        id: 3,
-        name: "Pierre Leclerc",
-        specialty: "Spécialiste Renault",
-        location: "Tahiti",
-        price: 80,
-        rating: 4.7,
-        reviews: 89,
-        available: true,
-        nextSlot: null
-      },
-      {
-        id: 4,
-        name: "Jean Rousseau",
-        specialty: "Électricien automobile",
-        location: "Papeete",
-        price: 100,
-        rating: 4.9,
-        reviews: 156,
-        available: false,
-        nextSlot: "17h45"
-      }
-    ];
+    // Configuration pour version générale
+    const generalConfig = {
+      professionals: [
+        {
+          id: 1,
+          name: "Marc Dubois",
+          specialty: "Mécanicien automobile",
+          location: "Papeete",
+          price: 85,
+          rating: 4.8,
+          reviews: 127,
+          available: true,
+          nextSlot: null
+        },
+        {
+          id: 2,
+          name: "Sophie Martin",
+          specialty: "Spécialiste Toyota",
+          location: "Rennes",
+          price: 95,
+          rating: 4.9,
+          reviews: 203,
+          available: false,
+          nextSlot: "18h30"
+        },
+        {
+          id: 3,
+          name: "Pierre Leclerc",
+          specialty: "Spécialiste Renault",
+          location: "Tahiti",
+          price: 80,
+          rating: 4.7,
+          reviews: 89,
+          available: true,
+          nextSlot: null
+        },
+        {
+          id: 4,
+          name: "Jean Rousseau",
+          specialty: "Électricien automobile",
+          location: "Papeete",
+          price: 100,
+          rating: 4.9,
+          reviews: 156,
+          available: false,
+          nextSlot: "17h45"
+        }
+      ],
+      brands: [
+        "Toyota", "Renault", "Peugeot", "Citroën", "Volkswagen",
+        "Mercedes", "BMW", "Audi", "Honda", "Nissan", "Ford", "Autre"
+      ],
+      placeholder: "Ma voiture ne démarre pas, Mon ordinateur est bloqué...",
+      listTitle: "Mécaniciens disponibles",
+      aiMessage1: "J'ai sélectionné pour vous une liste de mécaniciens.",
+      aiMessage1Link: "liste de mécaniciens",
+      aiMessage2: "Pourriez-vous m'indiquer la marque et le modèle de votre véhicule afin que j'affine les résultats ?",
+      brandsTitle: "Sélectionnez une marque :",
+      showBrands: true,
+      showPrice: true
+    };
 
-    const carBrands = [
-      "Toyota", "Renault", "Peugeot", "Citroën", "Volkswagen", 
-      "Mercedes", "BMW", "Audi", "Honda", "Nissan", "Ford", "Autre"
-    ];
+    // Configuration pour version services (professions libérales)
+    const servicesConfig = {
+      professionals: [
+        {
+          id: 1,
+          name: "Marie Laurent",
+          specialty: "Avocate en droit de la famille",
+          location: "Papeete",
+          price: null,
+          rating: 4.9,
+          reviews: 156,
+          available: true,
+          nextSlot: null
+        },
+        {
+          id: 2,
+          name: "Pierre Dubois",
+          specialty: "Juriste en droit commercial",
+          location: "Rennes",
+          price: null,
+          rating: 4.8,
+          reviews: 203,
+          available: false,
+          nextSlot: "18h30"
+        },
+        {
+          id: 3,
+          name: "Sophie Rousseau",
+          specialty: "Notaire",
+          location: "Tahiti",
+          price: null,
+          rating: 4.7,
+          reviews: 127,
+          available: true,
+          nextSlot: null
+        },
+        {
+          id: 4,
+          name: "Jean Martin",
+          specialty: "Avocat en droit pénal",
+          location: "Papeete",
+          price: null,
+          rating: 4.9,
+          reviews: 89,
+          available: false,
+          nextSlot: "17h45"
+        }
+      ],
+      brands: [],
+      placeholder: "J'ai un problème de succession, je veux divorcer, j'ai besoin de conseils juridique.",
+      listTitle: "Professionnels du droit disponibles",
+      aiMessage1: "J'ai sélectionné pour vous une liste de professionnels du droit.",
+      aiMessage1Link: "liste de professionnels du droit",
+      aiMessage2: "Pouvez-vous préciser votre besoin afin que je vous oriente vers le professionnel le plus adapté ?",
+      brandsTitle: "",
+      showBrands: false,
+      showPrice: false
+    };
+
+    // Détection du paramètre URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const version = urlParams.get('version') || 'general';
+    const config = version === 'services' ? servicesConfig : generalConfig;
 
     function TeleassistancePlatform() {
       const [searchQuery, setSearchQuery] = useState('');
@@ -249,8 +323,8 @@
         if (searchQuery.trim()) {
           setChatHistory([
             { type: 'user', text: searchQuery },
-            { type: 'ai', text: "J'ai sélectionné pour vous une liste de mécaniciens." },
-            { type: 'ai', text: "Pourriez-vous m'indiquer la marque et le modèle de votre véhicule afin que j'affine les résultats ?" }
+            { type: 'ai', text: config.aiMessage1 },
+            { type: 'ai', text: config.aiMessage2 }
           ]);
           setShowResults(true);
           setSearchQuery('');
@@ -405,12 +479,14 @@
                 <span className={`text-lg font-mono font-semibold ${callDuration < 0 ? 'text-orange-400' : 'text-white'}`}>
                   {formatCallDuration(callDuration)}
                 </span>
-                <span className="text-sm text-gray-300 ml-2">
-                  {callDuration < 0 
-                    ? `5 premières minutes gratuites puis ${currentProfessional.price}€/heure`
-                    : `${((currentProfessional.price * callDuration) / 3600).toFixed(2)}€`
-                  }
-                </span>
+                {config.showPrice && currentProfessional.price && (
+                  <span className="text-sm text-gray-300 ml-2">
+                    {callDuration < 0
+                      ? `5 premières minutes gratuites puis ${currentProfessional.price}€/heure`
+                      : `${((currentProfessional.price * callDuration) / 3600).toFixed(2)}€`
+                    }
+                  </span>
+                )}
               </div>
             </div>
 
@@ -519,14 +595,14 @@
                         </div>
                       ) : (
                         <div className="text-blue-600 font-medium">
-                          {msg.text === "J'ai sélectionné pour vous une liste de mécaniciens." ? (
+                          {msg.text === config.aiMessage1 ? (
                             <>
                               J'ai sélectionné pour vous une{' '}
-                              <a 
-                                href="#professionals-list" 
+                              <a
+                                href="#professionals-list"
                                 className="underline hover:text-blue-800 font-semibold"
                               >
-                                liste de mécaniciens
+                                {config.aiMessage1Link}
                               </a>
                               .
                             </>
@@ -545,7 +621,7 @@
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ma voiture ne démarre pas, Mon ordinateur est bloqué..."
+                  placeholder={config.placeholder}
                   className="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg resize-none"
                   rows="3"
                 />
@@ -560,28 +636,30 @@
 
             {showResults && (
               <>
-                <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                    Sélectionnez une marque :
-                  </h3>
-                  <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                    {carBrands.map((brand) => (
-                      <button
-                        key={brand}
-                        className="px-4 py-3 bg-gray-100 hover:bg-blue-100 hover:text-blue-700 text-gray-700 rounded-lg font-medium transition-colors"
-                      >
-                        {brand}
-                      </button>
-                    ))}
+                {config.showBrands && (
+                  <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                      {config.brandsTitle}
+                    </h3>
+                    <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                      {config.brands.map((brand) => (
+                        <button
+                          key={brand}
+                          className="px-4 py-3 bg-gray-100 hover:bg-blue-100 hover:text-blue-700 text-gray-700 rounded-lg font-medium transition-colors"
+                        >
+                          {brand}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="space-y-4" id="professionals-list">
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                    Mécaniciens disponibles
+                    {config.listTitle}
                   </h2>
-                  
-                  {professionals.map((pro) => (
+
+                  {config.professionals.map((pro) => (
                     <div
                       key={pro.id}
                       className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow"
@@ -599,7 +677,9 @@
                               {pro.name}
                             </h3>
                             <p className="text-gray-600 mb-2">{pro.specialty} ({pro.location})</p>
-                            <p className="text-blue-600 font-semibold mb-2">{pro.price}€/heure</p>
+                            {config.showPrice && pro.price && (
+                              <p className="text-blue-600 font-semibold mb-2">{pro.price}€/heure</p>
+                            )}
                             
                             <div className="flex items-center gap-2 mb-3">
                               <div className="flex items-center gap-1">
