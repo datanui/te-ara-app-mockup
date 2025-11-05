@@ -50,6 +50,10 @@
   </style>
 </head>
 <body>
+  <div id="fb-root"></div>
+  <script async defer crossorigin="anonymous"
+    src="https://connect.facebook.net/fr_FR/sdk.js#xfbml=1&version=v19.0"></script>
+
   <div id="root"></div>
   
   <script type="text/babel">
@@ -115,7 +119,7 @@
           name: "Marc Dubois",
           specialty: "Mécanicien automobile",
           location: "Papeete",
-          price: 85,
+          price: 1400,
           rating: 4.8,
           reviews: 127,
           available: true,
@@ -126,7 +130,7 @@
           name: "Sophie Martin",
           specialty: "Spécialiste Toyota",
           location: "Rennes",
-          price: 95,
+          price: 1600,
           rating: 4.9,
           reviews: 203,
           available: false,
@@ -137,7 +141,7 @@
           name: "Pierre Leclerc",
           specialty: "Spécialiste Renault",
           location: "Tahiti",
-          price: 80,
+          price: 1300,
           rating: 4.7,
           reviews: 89,
           available: true,
@@ -148,7 +152,7 @@
           name: "Jean Rousseau",
           specialty: "Électricien automobile",
           location: "Papeete",
-          price: 100,
+          price: 1700,
           rating: 4.9,
           reviews: 156,
           available: false,
@@ -484,8 +488,8 @@
                 {config.showPrice && currentProfessional.price && (
                   <span className="text-sm text-gray-300 ml-2">
                     {callDuration < 0
-                      ? `5 premières minutes gratuites puis ${currentProfessional.price}€/heure`
-                      : `${((currentProfessional.price * callDuration) / 3600).toFixed(2)}€`
+                      ? `5 premières minutes gratuites puis ${currentProfessional.price} XPF/10min`
+                      : `${Math.round((currentProfessional.price * callDuration) / 600)} XPF`
                     }
                   </span>
                 )}
@@ -680,7 +684,7 @@
                             </h3>
                             <p className="text-gray-600 mb-2">{pro.specialty} ({pro.location})</p>
                             {config.showPrice && pro.price && (
-                              <p className="text-blue-600 font-semibold mb-2">{pro.price}€/heure</p>
+                              <p className="text-blue-600 font-semibold mb-2">{pro.price} XPF/10min</p>
                             )}
                             
                             <div className="flex items-center gap-2 mb-3">
