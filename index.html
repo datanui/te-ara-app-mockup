@@ -251,6 +251,12 @@
       const [selectedSlot, setSelectedSlot] = useState(null);
       const [chatHistory, setChatHistory] = useState([]);
       const [callDuration, setCallDuration] = useState(0);
+      const [isTyping, setIsTyping] = useState(false);
+      const [currentTypingText, setCurrentTypingText] = useState('');
+      const [typingMessageIndex, setTypingMessageIndex] = useState(-1);
+      const [showProfessionals, setShowProfessionals] = useState(false);
+      const [showInputBox, setShowInputBox] = useState(true);
+      const [showBrandsSection, setShowBrandsSection] = useState(false);
 
       // Timer for call duration
       useEffect(() => {
@@ -265,6 +271,55 @@
           if (interval) clearInterval(interval);
         };
       }, [inCall]);
+
+      // Typewriter effect for AI messages
+      useEffect(() => {
+        if (!isTyping || typingMessageIndex < 0) return;
+
+        const messages = [config.aiMessage1, config.aiMessage2];
+        const messageToType = messages[typingMessageIndex];
+
+        if (!messageToType) return;
+
+        let currentIndex = 0;
+        setCurrentTypingText('');
+
+        const typingInterval = setInterval(() => {
+          if (currentIndex < messageToType.length) {
+            setCurrentTypingText(messageToType.substring(0, currentIndex + 1));
+            currentIndex++;
+          } else {
+            // Typing finished
+            clearInterval(typingInterval);
+            setIsTyping(false);
+
+            // Add the complete message to chat history
+            setChatHistory(prev => [...prev, { type: 'ai', text: messageToType }]);
+            setCurrentTypingText('');
+
+            // Determine what to do next
+            if (typingMessageIndex === 0) {
+              // After first message, show professionals and start second message
+              setTimeout(() => {
+                setShowProfessionals(true);
+                setTimeout(() => {
+                  setTypingMessageIndex(1);
+                  setIsTyping(true);
+                }, 500);
+              }, 300);
+            } else if (typingMessageIndex === 1) {
+              // After second message, show input box and brands
+              setTimeout(() => {
+                setShowInputBox(true);
+                setShowBrandsSection(true);
+                setTypingMessageIndex(-1);
+              }, 300);
+            }
+          }
+        }, 30); // 30ms per character for smooth typing
+
+        return () => clearInterval(typingInterval);
+      }, [isTyping, typingMessageIndex]);
 
       const formatCallDuration = (seconds) => {
         const isNegative = seconds < 0;
@@ -327,13 +382,20 @@
 
       const handleSearch = () => {
         if (searchQuery.trim()) {
-          setChatHistory([
-            { type: 'user', text: searchQuery },
-            { type: 'ai', text: config.aiMessage1 },
-            { type: 'ai', text: config.aiMessage2 }
-          ]);
-          setShowResults(true);
+          const userMessage = searchQuery;
           setSearchQuery('');
+          setShowInputBox(false);
+          setShowBrandsSection(false);
+
+          // Add user message immediately
+          setChatHistory([{ type: 'user', text: userMessage }]);
+          setShowResults(true);
+
+          // Start typing the first AI message
+          setTimeout(() => {
+            setTypingMessageIndex(0);
+            setIsTyping(true);
+          }, 500);
         }
       };
 
@@ -619,30 +681,40 @@
                       )}
                     </div>
                   ))}
+                  {isTyping && currentTypingText && (
+                    <div>
+                      <div className="text-blue-600 font-medium">
+                        {currentTypingText}
+                        <span className="animate-pulse">|</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
-              <div className="relative">
-                <textarea
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder={showResults ? config.placeholderFollow : config.placeholder}
-                  className="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg resize-none"
-                  rows="3"
-                />
-                <button
-                  onClick={handleSearch}
-                  className="absolute bottom-3 right-3 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors"
-                >
-                  <Send className="w-5 h-5" />
-                </button>
-              </div>
+              {showInputBox && (
+                <div className="relative">
+                  <textarea
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder={showResults ? config.placeholderFollow : config.placeholder}
+                    className="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg resize-none"
+                    rows="3"
+                  />
+                  <button
+                    onClick={handleSearch}
+                    className="absolute bottom-3 right-3 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors"
+                  >
+                    <Send className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
             </div>
 
             {showResults && (
               <>
-                {config.showBrands && (
+                {config.showBrands && showBrandsSection && (
                   <div className="bg-white rounded-xl shadow-md p-6 mb-8">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">
                       {config.brandsTitle}
@@ -660,12 +732,13 @@
                   </div>
                 )}
 
-                <div className="space-y-4" id="professionals-list">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                    {config.listTitle}
-                  </h2>
+                {showProfessionals && (
+                  <div className="space-y-4" id="professionals-list">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                      {config.listTitle}
+                    </h2>
 
-                  {config.professionals.map((pro) => (
+                    {config.professionals.map((pro) => (
                     <div
                       key={pro.id}
                       className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow"
@@ -732,8 +805,9 @@
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </>
             )}
 
