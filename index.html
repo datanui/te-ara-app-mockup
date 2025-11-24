@@ -234,10 +234,80 @@
       showPrice: false
     };
 
+    // Configuration pour version scooter (mécaniciens 2 roues)
+    const scooterMechanicConfig = {
+      professionals: [
+        {
+          id: 1,
+          name: "Karim Tevaearai",
+          specialty: "Mécanicien 2-roues spécialiste Yamaha",
+          location: "Papeete",
+          price: 1200,
+          rating: 4.9,
+          reviews: 145,
+          available: true,
+          nextSlot: null
+        },
+        {
+          id: 2,
+          name: "Teva Manutahi",
+          specialty: "Mécanicien 2-roues spécialiste Honda",
+          location: "Punaauia",
+          price: 1300,
+          rating: 4.8,
+          reviews: 178,
+          available: false,
+          nextSlot: "16h00"
+        },
+        {
+          id: 3,
+          name: "Laurent Chen",
+          specialty: "Mécanicien 2-roues spécialiste Vespa",
+          location: "Faaa",
+          price: 1100,
+          rating: 4.7,
+          reviews: 92,
+          available: true,
+          nextSlot: null
+        },
+        {
+          id: 4,
+          name: "Patrick Tamatoa",
+          specialty: "Mécanicien 2-roues toutes marques",
+          location: "Papeete",
+          price: 1400,
+          rating: 4.9,
+          reviews: 201,
+          available: false,
+          nextSlot: "19h15"
+        }
+      ],
+      brands: [
+        "Yamaha", "Honda", "Vespa", "Piaggio", "Suzuki",
+        "Kymco", "SYM", "Peugeot", "Keeway", "MBK", "Derbi", "Autre"
+      ],
+      placeholder: "Mon carburateur est bouché",
+      placeholderFollow: "Twitter 50cc",
+      listTitle: "Mécaniciens 2-roues disponibles",
+      aiMessage1: "J'ai sélectionné pour vous une liste de mécaniciens 2-roues.",
+      aiMessage1Link: "liste de mécaniciens 2-roues",
+      aiMessage2: "Pourriez-vous m'indiquer la marque et le modèle de votre scooter ou moto afin que j'affine les résultats ?",
+      brandsTitle: "Sélectionnez une marque :",
+      showBrands: true,
+      showPrice: true
+    };
+
     // Détection du paramètre URL
     const urlParams = new URLSearchParams(window.location.search);
     const version = urlParams.get('version') || 'general';
-    const config = version === 'services' ? servicesConfig : generalConfig;
+    let config;
+    if (version === 'services') {
+      config = servicesConfig;
+    } else if (version === 'scooter') {
+      config = scooterMechanicConfig;
+    } else {
+      config = generalConfig;
+    }
 
     function TeleassistancePlatform() {
       const [searchQuery, setSearchQuery] = useState('');
