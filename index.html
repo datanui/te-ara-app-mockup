@@ -329,6 +329,7 @@
       const [showBrandsSection, setShowBrandsSection] = useState(false);
       const [selectedBrand, setSelectedBrand] = useState(null);
       const [filteredProfessionals, setFilteredProfessionals] = useState(config.professionals);
+      const [customTypingMessage, setCustomTypingMessage] = useState('');
 
       // Timer for call duration
       useEffect(() => {
@@ -348,7 +349,7 @@
       useEffect(() => {
         if (!isTyping || typingMessageIndex < 0) return;
 
-        const messages = [config.aiMessage1, config.aiMessage2];
+        const messages = [config.aiMessage1, config.aiMessage2, customTypingMessage];
         const messageToType = messages[typingMessageIndex];
 
         if (!messageToType) return;
@@ -385,6 +386,12 @@
                 setShowInputBox(true);
                 setShowBrandsSection(true);
                 setTypingMessageIndex(-1);
+              }, 300);
+            } else if (typingMessageIndex === 2) {
+              // After brand selection message, just reset
+              setTimeout(() => {
+                setTypingMessageIndex(-1);
+                setCustomTypingMessage('');
               }, 300);
             }
           }
@@ -534,6 +541,14 @@
         }
 
         setFilteredProfessionals(filtered);
+
+        // Déclencher le message typewriter de confirmation
+        setTimeout(() => {
+          const confirmationMessage = `J'ai sélectionné les mécaniciens spécialisés pour : ${brand}`;
+          setCustomTypingMessage(confirmationMessage);
+          setTypingMessageIndex(2);
+          setIsTyping(true);
+        }, 500);
       };
 
       if (showBooking && currentProfessional) {
