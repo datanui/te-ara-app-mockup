@@ -855,7 +855,7 @@
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
-                    placeholder={showResults ? config.placeholderFollow : config.placeholder}
+                    placeholder={selectedBrand ? "Donner plus de précisions..." : (showResults ? config.placeholderFollow : config.placeholder)}
                     className="w-full px-4 py-3 pr-12 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 text-lg resize-none"
                     rows="3"
                   />
