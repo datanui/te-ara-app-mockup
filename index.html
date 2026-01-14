@@ -525,19 +525,38 @@
 
         // Filtrer les mécaniciens selon la marque
         let filtered = [];
-        if (brand === 'Toyota') {
-          // Sophie Martin en premier, Pierre Leclerc n'apparaît pas
-          filtered = config.professionals.filter(pro => pro.id !== 3);
-          // Mettre Sophie Martin (id 2) en premier
-          filtered.sort((a, b) => a.id === 2 ? -1 : b.id === 2 ? 1 : 0);
-        } else if (brand === 'Renault') {
-          // Pierre Leclerc en premier, Sophie Martin n'apparaît pas
-          filtered = config.professionals.filter(pro => pro.id !== 2);
-          // Mettre Pierre Leclerc (id 3) en premier
-          filtered.sort((a, b) => a.id === 3 ? -1 : b.id === 3 ? 1 : 0);
+
+        if (version === 'scooter') {
+          // Version scooter : filtrage par spécialité
+          if (brand === 'Yamaha') {
+            // Karim Tevaearai (id 1) spécialiste Yamaha + Patrick Tamatoa (id 4) toutes marques
+            filtered = config.professionals.filter(pro => pro.id === 1 || pro.id === 4);
+          } else if (brand === 'Honda') {
+            // Teva Manutahi (id 2) spécialiste Honda + Patrick Tamatoa (id 4) toutes marques
+            filtered = config.professionals.filter(pro => pro.id === 2 || pro.id === 4);
+          } else if (brand === 'Vespa') {
+            // Laurent Chen (id 3) spécialiste Vespa + Patrick Tamatoa (id 4) toutes marques
+            filtered = config.professionals.filter(pro => pro.id === 3 || pro.id === 4);
+          } else {
+            // Autres marques : uniquement Patrick Tamatoa (id 4) qui fait toutes marques
+            filtered = config.professionals.filter(pro => pro.id === 4);
+          }
         } else {
-          // Liste complète pour les autres marques
-          filtered = [...config.professionals];
+          // Version générale (voitures)
+          if (brand === 'Toyota') {
+            // Sophie Martin en premier, Pierre Leclerc n'apparaît pas
+            filtered = config.professionals.filter(pro => pro.id !== 3);
+            // Mettre Sophie Martin (id 2) en premier
+            filtered.sort((a, b) => a.id === 2 ? -1 : b.id === 2 ? 1 : 0);
+          } else if (brand === 'Renault') {
+            // Pierre Leclerc en premier, Sophie Martin n'apparaît pas
+            filtered = config.professionals.filter(pro => pro.id !== 2);
+            // Mettre Pierre Leclerc (id 3) en premier
+            filtered.sort((a, b) => a.id === 3 ? -1 : b.id === 3 ? 1 : 0);
+          } else {
+            // Liste complète pour les autres marques
+            filtered = [...config.professionals];
+          }
         }
 
         setFilteredProfessionals(filtered);
