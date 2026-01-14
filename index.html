@@ -327,6 +327,8 @@
       const [showProfessionals, setShowProfessionals] = useState(false);
       const [showInputBox, setShowInputBox] = useState(true);
       const [showBrandsSection, setShowBrandsSection] = useState(false);
+      const [selectedBrand, setSelectedBrand] = useState(null);
+      const [filteredProfessionals, setFilteredProfessionals] = useState(config.professionals);
 
       // Timer for call duration
       useEffect(() => {
@@ -502,6 +504,36 @@
           e.preventDefault();
           handleSearch();
         }
+      };
+
+      const handleBrandClick = (brand) => {
+        // Ajouter la marque comme message utilisateur
+        setChatHistory(prev => [...prev, { type: 'user', text: brand }]);
+
+        // Masquer la section des marques
+        setShowBrandsSection(false);
+
+        // Sauvegarder la marque sélectionnée
+        setSelectedBrand(brand);
+
+        // Filtrer les mécaniciens selon la marque
+        let filtered = [];
+        if (brand === 'Toyota') {
+          // Sophie Martin en premier, Pierre Leclerc n'apparaît pas
+          filtered = config.professionals.filter(pro => pro.id !== 3);
+          // Mettre Sophie Martin (id 2) en premier
+          filtered.sort((a, b) => a.id === 2 ? -1 : b.id === 2 ? 1 : 0);
+        } else if (brand === 'Renault') {
+          // Pierre Leclerc en premier, Sophie Martin n'apparaît pas
+          filtered = config.professionals.filter(pro => pro.id !== 2);
+          // Mettre Pierre Leclerc (id 3) en premier
+          filtered.sort((a, b) => a.id === 3 ? -1 : b.id === 3 ? 1 : 0);
+        } else {
+          // Liste complète pour les autres marques
+          filtered = [...config.professionals];
+        }
+
+        setFilteredProfessionals(filtered);
       };
 
       if (showBooking && currentProfessional) {
@@ -728,8 +760,10 @@
                   {chatHistory.map((msg, index) => (
                     <div key={index}>
                       {msg.type === 'user' ? (
-                        <div className="text-gray-800 bg-gray-50 p-3 rounded-lg">
-                          {msg.text}
+                        <div className="flex justify-end">
+                          <div className="text-white bg-blue-600 p-3 rounded-lg max-w-[80%]">
+                            {msg.text}
+                          </div>
                         </div>
                       ) : (
                         <div className="text-blue-600 font-medium">
@@ -762,6 +796,25 @@
                 </div>
               )}
 
+              {config.showBrands && showBrandsSection && (
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                    {config.brandsTitle}
+                  </h3>
+                  <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                    {config.brands.map((brand) => (
+                      <button
+                        key={brand}
+                        onClick={() => handleBrandClick(brand)}
+                        className="px-4 py-3 bg-gray-100 hover:bg-blue-100 hover:text-blue-700 text-gray-700 rounded-lg font-medium transition-colors"
+                      >
+                        {brand}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {showInputBox && (
                 <div className="relative">
                   <textarea
@@ -784,31 +837,13 @@
 
             {showResults && (
               <>
-                {config.showBrands && showBrandsSection && (
-                  <div className="bg-white rounded-xl shadow-md p-6 mb-8">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                      {config.brandsTitle}
-                    </h3>
-                    <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                      {config.brands.map((brand) => (
-                        <button
-                          key={brand}
-                          className="px-4 py-3 bg-gray-100 hover:bg-blue-100 hover:text-blue-700 text-gray-700 rounded-lg font-medium transition-colors"
-                        >
-                          {brand}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
                 {showProfessionals && (
                   <div className="space-y-4" id="professionals-list">
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">
                       {config.listTitle}
                     </h2>
 
-                    {config.professionals.map((pro) => (
+                    {filteredProfessionals.map((pro) => (
                     <div
                       key={pro.id}
                       className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow"
@@ -859,18 +894,18 @@
                           {pro.available && (
                             <button
                               onClick={() => handleCall(pro)}
-                              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-colors whitespace-nowrap"
+                              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 md:px-6 sm:px-3 rounded-lg font-semibold flex items-center gap-2 transition-colors whitespace-nowrap justify-center"
                             >
                               <Phone className="w-5 h-5" />
-                              Appeler
+                              <span className="hidden md:inline">Appeler</span>
                             </button>
                           )}
-                          <button 
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-colors whitespace-nowrap"
+                          <button
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 md:px-6 sm:px-3 rounded-lg font-semibold flex items-center gap-2 transition-colors whitespace-nowrap justify-center"
                             onClick={() => handleBooking(pro)}
                           >
                             <Calendar className="w-5 h-5" />
-                            Rendez-vous
+                            <span className="hidden md:inline">Rendez-vous</span>
                           </button>
                         </div>
                       </div>
